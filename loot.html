@@ -1,0 +1,304 @@
+<html>
+<style>
+#myProgress {
+  width: 100%;
+  background-color: #ddd;
+}
+
+#myBar {
+  width: 1%;
+  height: 20px;
+  background-color: #4CAF50;
+}
+
+.inventory{
+	height:500px;
+	width:95%;
+	margin:auto;
+	text-align:center;
+	background-color:rgb(240,240,240);
+}
+
+.panel{
+  width:18%;
+  height:90%;
+  margin:1%;
+	background-color:rgb(210,210,210);
+  float:left;
+  overflow-y:auto;
+}
+</style>
+<body>
+<script>
+class Item{
+	constructor(name, rarity, price, color) {
+     this.name = name;
+     this.rarity = rarity;
+     this.price = price;
+     this.color = color;
+  }
+  
+  toString(){
+  	return "<span style='color:" + this.color + ";'>" + this.rarity + " " + this.name + "</span>: " + this.price + " gold";
+  }
+  
+  withoutRarity(){
+  	return "<span style='color:" + this.color + ";'>" + this.name + "</span>: " + this.price + " gold";
+  }
+}
+
+var inventory = [];
+
+var weapons = ["Shortsword", "Axe", "Dagger", "Scepter", "Wand", "Battleaxe", "Bow", "Crossbow", "Falchion", "Longsword", "Club", "Mace", "Maul", "Quarterstaff", "Glaive", "Lance"];
+var origins = ["Man'ari", "Eben", "Dragoon", "Dryti", "Grimeal", "Anceol", "Sa'hildi", "Im'ren", "Dulan", "Hemming", "Elune", "Kabal", "Magi"];
+
+var exp = 0;
+var expMax = 50;
+var level = 1;
+var autoNum = 0;
+var autoPrice = 250000;
+
+var avgPrice = 0;
+var totalPrice = 0;
+var commonQuantity = 0;
+var rareQuantity = 0;
+var epicQuantity = 0;
+var legendaryQuantity = 0;
+var exoticQuantity = 0;
+var lps = 0;
+
+var interval = 0;
+</script>
+
+<div class = "inventory" id = "inventory" style = "display:none;">
+  <div class = "panel">
+    <h3 id = "exoticsTitle">Legendaries</h3>
+    <p id = "exotics"></p>
+  </div>
+  <div class = "panel">
+    <h3 id = "legendariesTitle">Legendaries</h3>
+    <p id = "legendaries"></p>
+  </div>
+  <div class = "panel">
+    <h3 id = "epicsTitle">Epics</h3>
+    <p id = "epics"></p>
+  </div>
+  <div class = "panel">
+    <h3 id = "raresTitle">Rares</h3>
+    <p id = "rares"></p>
+  </div>
+  <div class = "panel">
+    <h3 id = "commonsTitle">Commons</h3>
+    <p id = "commons"></p>
+  </div>
+  <button id="returnButton" onClick="returnHome()" style="margin:auto;">Back</button>
+</div>
+
+<br>
+
+<div id = "main">
+<p id = "level"></p>
+<div id="myProgress">
+  <div id="myBar"></div>
+</div>
+<br>
+<button id="lootButton" onClick="loot()">Loot</button>
+<button id="openInventory" onClick="showInventory()">Inventory</button>
+<p id="stats" style="float:right;"></p>
+<p id="test"></p>
+<p id="curr"></p>
+<br>
+<button id="buyButton" onClick="buyAuto()">Buy AutoLooter ($250000)</button>
+<span id="buyText"> 0 LPS</span>
+</div>
+
+
+<script>
+function loot(){
+	var item = createItem();
+	inventory.push(item);
+  document.getElementById("curr").innerHTML = item.toString() + "<br>";
+  totalPrice += item.price;
+  updateStats();
+  gainExp();
+}
+
+function showInventory(){
+	updateStats();
+  
+  document.getElementById("exotics").innerHTML = "";
+  document.getElementById("legendaries").innerHTML = "";
+  document.getElementById("epics").innerHTML = "";
+  document.getElementById("rares").innerHTML = "";
+  document.getElementById("commons").innerHTML = "";
+  
+  var exoticNum = 0;
+  var legendaryNum = 0;
+  var epicNum = 0;
+  var rareNum = 0;
+  var commonNum = 0;
+  
+	for (i = inventory.length - 1; i >= 0; i--) {
+  	var element = inventory[i];
+  	var rar = element.rarity;
+    if(rar == "Exotic" && exoticNum<100){
+    	exoticNum++;
+  		document.getElementById("exotics").innerHTML += element.withoutRarity() + "<br> <br>";
+  	}
+    if(rar == "Legendary" && legendaryNum<100){
+    	legendaryNum++;
+  		document.getElementById("legendaries").innerHTML += element.withoutRarity() + "<br> <br>";
+  	}
+  	if(rar == "Epic" && epicNum<100){
+    	epicNum++;
+  		document.getElementById("epics").innerHTML += element.withoutRarity() + "<br> <br>";
+  	}
+  	if(rar == "Rare" && rareNum<100){
+    	rareNum++;
+  		document.getElementById("rares").innerHTML += element.withoutRarity() + "<br> <br>";
+  	}
+  	if(rar == "Common" && commonNum<100){
+    	commonNum++;
+  		document.getElementById("commons").innerHTML += element.withoutRarity() + "<br> <br>";
+  	}
+  }
+  
+  document.getElementById("exoticsTitle").innerHTML = "Exotics (" + exoticQuantity + ")";
+  document.getElementById("legendariesTitle").innerHTML = "Legendaries (" + legendaryQuantity + ")";
+  document.getElementById("epicsTitle").innerHTML = "Epics (" + epicQuantity + ")";
+  document.getElementById("raresTitle").innerHTML = "Rares (" + rareQuantity + ")";
+  document.getElementById("commonsTitle").innerHTML = "Commons (" + commonQuantity + ")";
+
+	document.getElementById("inventory").style.display = 'block';
+  document.getElementById("main").style.display = 'none';
+}
+
+function returnHome(){
+	document.getElementById("inventory").style.display = 'none';
+  document.getElementById("main").style.display = 'block';
+}
+
+function buyAuto(){
+	if(totalPrice > autoPrice){
+  	totalPrice -= autoPrice;
+    autoPrice = parseInt(autoPrice * 1.05, 10);
+		autoNum++;
+  	if(autoNum > 1){
+  		clearInterval(interval);
+  	}
+		interval = setInterval(loot, 5000/autoNum);
+    lps += .2;
+    document.getElementById("buyButton").innerHTML = "Buy AutoLooter ($" + autoPrice + ")";
+    document.getElementById("buyText").innerHTML = round(lps, 2) + " LPS";
+    updateStats();
+  }
+}
+
+function round(value, decimals) {
+  return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+}
+
+function gainExp(){
+	var curr  = inventory[inventory.length - 1];
+  var rar = curr.rarity;
+  var add = 0;
+  if(rar == "Exotic"){
+  	add = 100;
+  	exp += add;
+  }
+  if(rar == "Legendary"){
+  	add = 100;
+  	exp += add;
+  }
+  if(rar == "Epic"){
+  	add = 20;
+  	exp += add;
+  }
+ if(rar == "Rare"){
+ 		add = 5;
+  	exp += add;
+  }
+  if(rar == "Common"){
+  	add = 1;
+  	exp += add;
+  }
+  if (exp > expMax){
+  	exp = exp - expMax;
+    expMax = parseInt(expMax * 1.2, 10);
+    level++;
+  }
+  document.getElementById("level").innerHTML = "Level " + level + ": " + exp + "/" + expMax + " (+" + add + ")";
+  var elem = document.getElementById("myBar");
+  elem.style.width = ((exp/expMax) * 100) + '%'; 
+}
+
+function updateStats(){
+  exoticQuantity = 0;
+  legendaryQuantity = 0;
+  epicQuantity = 0;
+  rareQuantity = 0;
+  commonQuantity = 0;
+	inventory.forEach(function(element) {
+  	var rar = element.rarity;
+     if(rar == "Exotic"){
+  		exoticQuantity++;
+  	}
+    if(rar == "Legendary"){
+  		legendaryQuantity++;
+  	}
+  	if(rar == "Epic"){
+  		epicQuantity++;
+  	}
+  	if(rar == "Rare"){
+  		rareQuantity++;
+  	}
+  	if(rar == "Common"){
+  		commonQuantity++;
+  	}
+  });
+  displayStats();
+}
+
+function displayStats(){
+	document.getElementById("stats").innerHTML = "Total Gold: " + totalPrice + "<br>" + "Commons: " + commonQuantity + "<br>" + "Rares: " + rareQuantity + "<br>" + "Epics: " + epicQuantity + "<br>" + "Legendaries: " + legendaryQuantity + "<br>" + "Exotics: " + exoticQuantity;
+
+}
+
+function createItem(){
+	var name = weapons[Math.floor(Math.random() * weapons.length)] + " of the " + origins[Math.floor(Math.random() * origins.length)];
+  var pri = 100;
+  var rar = "";
+  var col = "";
+  var rnd = Math.random();
+  if(rnd >= .2){
+  	pri = Math.floor(Math.random() * 100);
+    rar = "Common";
+    col = "gray";
+  }
+  else if(rnd < .2 && rnd >= .05){
+    pri = Math.floor(Math.random() * 900) + 100;
+    rar = "Rare";
+    col = "blue";
+  }
+  else if(rnd < .05 && rnd >= .01){
+  	pri = Math.floor(Math.random() * 9000) + 1000;
+    rar = "Epic";
+    col = "purple";
+  }
+  else if(rnd < .01 && rnd > .001){
+  	pri = Math.floor(Math.random() * 90000) + 10000;
+    rar = "Legendary";
+    col = "orange";
+  }
+  else{
+  	pri = Math.floor(Math.random() * 900000) + 100000;
+    rar = "Exotic";
+    col = "rgb(255,105,180)";
+  }
+	return new Item(name, rar, pri, col);
+}
+
+</script>
+
+</body>
+</html>
