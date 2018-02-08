@@ -377,7 +377,7 @@
   function save(){
   	var save = {
     	inv:inv,
-    	dustnum:dustnum,
+    	dustNum:dustNum,
       price:price,
       autoNum:autoNum,
       pps:pps
@@ -392,6 +392,7 @@
   	if(localStorage.getItem("save") !== null){
     	var savegame = JSON.parse(localStorage.getItem("save"));
       if (typeof savegame.inv !== "undefined") inv = savegame.inv;
+      if (typeof savegame.dustNum !== "undefined") dustNum = savegame.dustNum;
       if (typeof savegame.price !== "undefined") price = savegame.price;
       if (typeof savegame.autoNum !== "undefined") autoNum = savegame.autoNum;
       if (typeof savegame.pps !== "undefined") pps = savegame.pps;
