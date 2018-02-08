@@ -164,6 +164,8 @@
   var autoNum = 0;
   var pps = 0;
   
+  load();
+  
   var currentClass = "";
   
   var cNeutralNames = ["Amani Berserker", "Loot Hoarder", "Bonemare", "Abusive Sergeant", "Acolyte of Pain", "Bloodsail Raider", "Cobalt Scalebane", "Deathspeaker", "Earthen Ring Farseer", "Faerie Dragon", "Glacial Shard", "Hyldnir Frostrider", "Ironbeak Owl", "Jungle Panther", "Kooky Chemist", "Mad Bomber", "Raging Worgen"];
@@ -370,6 +372,30 @@
   
   function round(value, decimals) {
   	return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+  }
+  
+  function save(){
+  	var save = {
+    	inv:inv,
+    	dustnum:dustnum,
+      price:price,
+      autoNum:autoNum,
+      pps:pps
+    }
+    
+		localStorage.setItem("save",JSON.stringify(save));
+  }
+  
+  setInterval(save, 10000);
+  
+  function load(){
+  	if(localStorage.getItem("save") !== null){
+    	var savegame = JSON.parse(localStorage.getItem("save"));
+      if (typeof savegame.inv !== "undefined") inv = savegame.inv;
+      if (typeof savegame.price !== "undefined") price = savegame.price;
+      if (typeof savegame.autoNum !== "undefined") autoNum = savegame.autoNum;
+      if (typeof savegame.pps !== "undefined") pps = savegame.pps;
+    }
   }
   
 </script>
