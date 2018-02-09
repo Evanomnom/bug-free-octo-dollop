@@ -29,7 +29,10 @@
 <div id = "main">
   <p id="pack"></p>
   <button id="openButton" onClick="createPack()">Open Pack</button>
-  <button id="invButton" onClick="showInv('neutral')">Collection</button>
+  <button id="invButton" onClick="showInv('NEUTRAL')">Collection</button>
+  <button id="saveButton" onClick="save()">Save</button>
+  <button id="loadButton" onClick="load()">Load</button>
+  <button id="clearButton" onClick="clearSave()">Clear</button>
   <span id="mainDust">Dust: 0</span>
   <br>
   <br>
@@ -55,16 +58,16 @@
         <h3 id="commonsTitle">Commons</h3>
         <p id="commons"></p>
       </div>
-  <button id="druidButton" onClick="showInv('druid')">Druid</button>
-  <button id="hunterButton" onClick="showInv('hunter')">Hunter</button>
-  <button id="mageButton" onClick="showInv('mage')">Mage</button>
-  <button id="paladinButton" onClick="showInv('paladin')">Paladin</button>
-  <button id="priestButton" onClick="showInv('priest')">Priest</button>
-  <button id="rogueButton" onClick="showInv('rogue')">Rogue</button>
-  <button id="shamanButton" onClick="showInv('shaman')">Shaman</button>
-  <button id="warlockButton" onClick="showInv('warlock')">Warlock</button>
-  <button id="warriorButton" onClick="showInv('warrior')">Warrior</button>
-  <button id="neutralButton" onClick="showInv('neutral')">Neutral</button>
+  <button id="DRUIDButton" onClick="showInv('DRUID')">Druid</button>
+  <button id="HUNTERButton" onClick="showInv('HUNTER')">Hunter</button>
+  <button id="MAGEButton" onClick="showInv('MAGE')">Mage</button>
+  <button id="PALADINButton" onClick="showInv('PALADIN')">Paladin</button>
+  <button id="PRIESTButton" onClick="showInv('PRIEST')">Priest</button>
+  <button id="ROGUEButton" onClick="showInv('ROGUE')">Rogue</button>
+  <button id="SHAMANButton" onClick="showInv('SHAMAN')">Shaman</button>
+  <button id="WARLOCKButton" onClick="showInv('WARLOCK')">Warlock</button>
+  <button id="WARRIORButton" onClick="showInv('WARRIOR')">Warrior</button>
+  <button id="NEUTRALButton" onClick="showInv('NEUTRAL')">Neutral</button>
   <br>
   <br>
   <button id="backButton" onClick="backToMain()">Back</button>
@@ -72,7 +75,11 @@
   <p id="invDust">Dust: 0</p>
 </div>
 
+<script type="text/javascript" src="data.json"></script>
 <script>
+	var cards = data;
+	console.log(cards);
+	
 	class Card {
       constructor(name, rarity, cla) {
         this.name = name;
@@ -98,34 +105,34 @@
         	color = "orange";
         }
         
-        if(c == "neutral"){
+        if(c == "NEUTRAL"){
         	borderColor = "gray";
         }
-        else if(c == "mage"){
+        else if(c == "MAGE"){
         	borderColor = "#87cefa";
         }
-        else if(c == "druid"){
+        else if(c == "DRUID"){
         	borderColor = "#835C3B";
         }
-        else if(c == "hunter"){
+        else if(c == "HUNTER"){
         	borderColor = "#228b22";
         }
-        else if(c == "paladin"){
+        else if(c == "PALADIN"){
         	borderColor = "#ffd700";
         }
-        else if(c == "priest"){
+        else if(c == "PRIEST"){
         	borderColor = "#f5f5f5";
         }
-        else if(c == "rogue"){
+        else if(c == "ROGUE"){
         	borderColor = "#141414";
         }
-        else if(c == "shaman"){
+        else if(c == "SHAMAN"){
         	borderColor = "#191970";
         }
-        else if(c == "warlock"){
+        else if(c == "WARLOCK"){
         	borderColor = "#5e1d72"
         }
-        else if(c == "warrior"){
+        else if(c == "WARRIOR"){
         	borderColor = "#5b0509";
         }
         
@@ -148,76 +155,108 @@
   }
   
   class Collection {
-  	constructor(card){
+  	constructor(card, number){
     	this.card = card;
-      this.number = 1;
+      this.number = number;
     }
     
     toString(){
     	return this.card.toString() + " " + this.number + "x";
     }
   }
-
-  var inv = [];
+  
+  class Inv {
+	constructor(collections){
+		this.collections = collections;
+	}
+  }
+  
+  var inv = new Inv([]);
   var dustNum = 0;
   var price = 5000;
   var autoNum = 0;
   var pps = 0;
+  var interval = null;
   
   load();
+	
+  if(inv == null){
+	inv = new Inv([]);
+  }
   
   var currentClass = "";
   
-  var cNeutralNames = ["Amani Berserker", "Loot Hoarder", "Bonemare", "Abusive Sergeant", "Acolyte of Pain", "Bloodsail Raider", "Cobalt Scalebane", "Deathspeaker", "Earthen Ring Farseer", "Faerie Dragon", "Glacial Shard", "Hyldnir Frostrider", "Ironbeak Owl", "Jungle Panther", "Kooky Chemist", "Mad Bomber", "Raging Worgen"];
-  var rNeutralNames = ["Azure Drake", "Ancient Mage", "Angry Chicken"];
-  var eNeutralNames = ["Corridor Creeper", "Molten Giant", "Big Game Hunter"];
-  var lNeutralNames = ["Prince Keleseth", "Leeroy Jenkins", "C'thun"];
-
-  var cDruidNames = ["Druid Common"];
-  var rDruidNames = ["Druid Rare"];
-  var eDruidNames = ["Druid Epic"];
-  var lDruidNames = ["Druid Legendary"];
+  var cCards = [];
+  var rCards = [];
+  var eCards = [];
+  var lCards = [];
   
-  var cHunterNames = ["Hunter Common"];
-  var rHunterNames = ["Hunter Rare"];
-  var eHunterNames = ["Hunter Epic"];
-  var lHunterNames = ["Hunter Legendary"];
+  cards.forEach(function(element){
+	if(element.type == "MINION" || element.type == "SPELL" || element.type == "ENCHANTMENT" || element.type == "WEAPON"){
+		if(element.rarity == "COMMON"){
+			cCards.push(new Card(element.name, 'c', element.cardClass));
+		}
+		if(element.rarity == "RARE"){
+			rCards.push(new Card(element.name, 'r', element.cardClass));
+		}
+		if(element.rarity == "EPIC"){
+			eCards.push(new Card(element.name, 'e', element.cardClass));
+		}
+		if(element.rarity == "LEGENDARY"){
+			lCards.push(new Card(element.name, 'l', element.cardClass));
+		}
+	}
+  });
   
-  var cMageNames = ["Mana Wyrm", "Firelands Portal", "Mirror Entity"];
-  var rMageNames = ["Counterspell", "Blizzard"];
-  var eMageNames = ["Ice Block", "Meteor"];
-  var lMageNames = ["Archmage Antonidas"];
+  /*
+  var cNEUTRALNames = ["Amani Berserker", "Loot Hoarder", "Bonemare", "Abusive Sergeant", "Acolyte of Pain", "Bloodsail Raider", "Cobalt Scalebane", "Deathspeaker", "Earthen Ring Farseer", "Faerie Dragon", "Glacial Shard", "Hyldnir Frostrider", "Ironbeak Owl", "Jungle Panther", "Kooky Chemist", "Mad Bomber", "Raging Worgen"];
+  var rNEUTRALNames = ["Azure Drake", "Ancient MAGE", "Angry Chicken"];
+  var eNEUTRALNames = ["Corridor Creeper", "Molten Giant", "Big Game HUNTER"];
+  var lNEUTRALNames = ["Prince Keleseth", "Leeroy Jenkins", "C'thun"];
+  var cDRUIDNames = ["DRUID Common"];
+  var rDRUIDNames = ["DRUID Rare"];
+  var eDRUIDNames = ["DRUID Epic"];
+  var lDRUIDNames = ["DRUID Legendary"];
   
-  var cPaladinNames = ["Paladin Common"];
-  var rPaladinNames = ["Paladin Rare"];
-  var ePaladinNames = ["Paladin Epic"];
-  var lPaladinNames = ["Paladin Legendary"];
+  var cHUNTERNames = ["HUNTER Common"];
+  var rHUNTERNames = ["HUNTER Rare"];
+  var eHUNTERNames = ["HUNTER Epic"];
+  var lHUNTERNames = ["HUNTER Legendary"];
   
-  var cPriestNames = ["Priest Common"];
-  var rPriestNames = ["Priest Rare"];
-  var ePriestNames = ["Priest Epic"];
-  var lPriestNames = ["Priest Legendary"];
+  var cMAGENames = ["Mana Wyrm", "Firelands Portal", "Mirror Entity"];
+  var rMAGENames = ["Counterspell", "Blizzard"];
+  var eMAGENames = ["Ice Block", "Meteor"];
+  var lMAGENames = ["ArchMAGE Antonidas"];
   
-  var cRogueNames = ["Rogue Common"];
-  var rRogueNames = ["Rogue Rare"];
-  var eRogueNames = ["Rogue Epic"];
-  var lRogueNames = ["Rogue Legendary"];
+  var cPALADINNames = ["PALADIN Common"];
+  var rPALADINNames = ["PALADIN Rare"];
+  var ePALADINNames = ["PALADIN Epic"];
+  var lPALADINNames = ["PALADIN Legendary"];
   
-  var cShamanNames = ["Shaman Common"];
-  var rShamanNames = ["Shaman Rare"];
-  var eShamanNames = ["Shaman Epic"];
-  var lShamanNames = ["Shaman Legendary"];
+  var cPRIESTNames = ["PRIEST Common"];
+  var rPRIESTNames = ["PRIEST Rare"];
+  var ePRIESTNames = ["PRIEST Epic"];
+  var lPRIESTNames = ["PRIEST Legendary"];
   
-  var cWarlockNames = ["Warlock Common"];
-  var rWarlockNames = ["Warlock Rare"];
-  var eWarlockNames = ["Warlock Epic"];
-  var lWarlockNames = ["Warlock Legendary"];
+  var cROGUENames = ["ROGUE Common"];
+  var rROGUENames = ["ROGUE Rare"];
+  var eROGUENames = ["ROGUE Epic"];
+  var lROGUENames = ["ROGUE Legendary"];
   
-  var cWarriorNames = ["Warrior Common"];
-  var rWarriorNames = ["Warrior Rare"];
-  var eWarriorNames = ["Warrior Epic"];
-  var lWarriorNames = ["Warrior Legendary"];
-
+  var cSHAMANNames = ["SHAMAN Common"];
+  var rSHAMANNames = ["SHAMAN Rare"];
+  var eSHAMANNames = ["SHAMAN Epic"];
+  var lSHAMANNames = ["SHAMAN Legendary"];
+  
+  var cWARLOCKNames = ["WARLOCK Common"];
+  var rWARLOCKNames = ["WARLOCK Rare"];
+  var eWARLOCKNames = ["WARLOCK Epic"];
+  var lWARLOCKNames = ["WARLOCK Legendary"];
+  
+  var cWARRIORNames = ["WARRIOR Common"];
+  var rWARRIORNames = ["WARRIOR Rare"];
+  var eWARRIORNames = ["WARRIOR Epic"];
+  var lWARRIORNames = ["WARRIOR Legendary"];
   var cCards = [];
   var rCards = [];
   var eCards = [];
@@ -225,30 +264,30 @@
   
   function addCardsToArray(clas, cArr, rArr, eArr, lArr){
   	cArr.forEach(function(element){
- 			cCards.push(new Card(element, "c", clas));
+ 		cCards.push(new Card(element, "c", clas));
   	});
   	rArr.forEach(function(element){
- 			rCards.push(new Card(element, "r", clas));
+ 		rCards.push(new Card(element, "r", clas));
   	});
   	eArr.forEach(function(element){
- 			eCards.push(new Card(element, "e", clas));
+ 		eCards.push(new Card(element, "e", clas));
   	});
   	lArr.forEach(function(element){
- 			lCards.push(new Card(element, "l", clas));
+ 		lCards.push(new Card(element, "l", clas));
   	});
   }
   
-  addCardsToArray("neutral", cNeutralNames, rNeutralNames, eNeutralNames, lNeutralNames);
-  addCardsToArray("mage", cMageNames, rMageNames, eMageNames, lMageNames);
-  addCardsToArray("druid", cDruidNames, rDruidNames, eDruidNames, lDruidNames);
-  addCardsToArray("hunter", cHunterNames, rHunterNames, eHunterNames, lHunterNames);
-  addCardsToArray("paladin", cPaladinNames, rPaladinNames, ePaladinNames, lPaladinNames);
-  addCardsToArray("priest", cPriestNames, rPriestNames, ePriestNames, lPriestNames);
-  addCardsToArray("rogue", cRogueNames, rRogueNames, eRogueNames, lRogueNames);
-  addCardsToArray("shaman", cShamanNames, rShamanNames, eShamanNames, lShamanNames);
-  addCardsToArray("warlock", cWarlockNames, rWarlockNames, eWarlockNames, lWarlockNames);
-  addCardsToArray("warrior", cWarriorNames, rWarriorNames, eWarriorNames, lWarriorNames);
-  
+  addCardsToArray("NEUTRAL", cNEUTRALNames, rNEUTRALNames, eNEUTRALNames, lNEUTRALNames);
+  addCardsToArray("MAGE", cMAGENames, rMAGENames, eMAGENames, lMAGENames);
+  addCardsToArray("DRUID", cDRUIDNames, rDRUIDNames, eDRUIDNames, lDRUIDNames);
+  addCardsToArray("HUNTER", cHUNTERNames, rHUNTERNames, eHUNTERNames, lHUNTERNames);
+  addCardsToArray("PALADIN", cPALADINNames, rPALADINNames, ePALADINNames, lPALADINNames);
+  addCardsToArray("PRIEST", cPRIESTNames, rPRIESTNames, ePRIESTNames, lPRIESTNames);
+  addCardsToArray("ROGUE", cROGUENames, rROGUENames, eROGUENames, lROGUENames);
+  addCardsToArray("SHAMAN", cSHAMANNames, rSHAMANNames, eSHAMANNames, lSHAMANNames);
+  addCardsToArray("WARLOCK", cWARLOCKNames, rWARLOCKNames, eWARLOCKNames, lWARLOCKNames);
+  addCardsToArray("WARRIOR", cWARRIORNames, rWARRIORNames, eWARRIORNames, lWARRIORNames);
+  */
   
   function createPack(){
   	var c = [];
@@ -268,7 +307,7 @@
       c.push(card);
       addToInv(card);
     }
-    inv.sort(function(a, b) {
+    inv.collections.sort(function(a, b) {
    		return a.card.name.toLowerCase().localeCompare(b.card.name.toLowerCase());
 		});
     var p = new Pack(c);
@@ -283,7 +322,7 @@
     document.getElementById("rares").innerHTML = "";
     document.getElementById("commons").innerHTML = "";
   
-  	inv.forEach(function(element){
+  	inv.collections.forEach(function(element){
     	if(element.card.cla == cla){
     		if(element.card.rarity == "c"){
     			document.getElementById("commons").innerHTML += element.toString() + "<br>" + "<br>" + "<br>";
@@ -304,16 +343,18 @@
   
   	document.getElementById("inv").style.display = 'block';
     document.getElementById("main").style.display = 'none';
+	
+	console.log(inv);
   }
   
   function addToInv(card){
-  	for(i = 0; i < inv.length; i++){
-    	if(inv[i].card == card){
-      	inv[i].number++;
+  	for(i = 0; i < inv.collections.length; i++){
+    	if(inv.collections[i].card.name == card.name){
+      	inv.collections[i].number++;
         return;
       }
     }
-    inv.push(new Collection(card)); 
+    inv.collections.push(new Collection(card, 1)); 
   }
   
   function backToMain(){
@@ -324,29 +365,29 @@
   }
   
   function dust(){
-  	for(i = 0; i < inv.length; i++){
-    	if(inv[i].card.rarity == "l"){
-    		if(inv[i].number > 1){
-        	dustNum += (inv[i].number - 1) * 400;
-      		inv[i].number = 1;
+  	for(i = 0; i < inv.collections.length; i++){
+    	if(inv.collections[i].card.rarity == "l"){
+    		if(inv.collections[i].number > 1){
+        	dustNum += (inv.collections[i].number - 1) * 400;
+      		inv.collections[i].number = 1;
       	}
      	}
-      else if(inv[i].card.rarity == "e"){
-    		if(inv[i].number > 2){
-        	dustNum += (inv[i].number - 2) * 100;
-      		inv[i].number = 2;
+      else if(inv.collections[i].card.rarity == "e"){
+    		if(inv.collections[i].number > 2){
+        	dustNum += (inv.collections[i].number - 2) * 100;
+      		inv.collections[i].number = 2;
       	}
      	}
-      else if(inv[i].card.rarity == "r"){
-    		if(inv[i].number > 2){
-        	dustNum += (inv[i].number - 2) * 20;
-      		inv[i].number = 2;
+      else if(inv.collections[i].card.rarity == "r"){
+    		if(inv.collections[i].number > 2){
+        	dustNum += (inv.collections[i].number - 2) * 20;
+      		inv.collections[i].number = 2;
       	}
      	}
-      else if(inv[i].card.rarity == "c"){
-    		if(inv[i].number > 2){
-        	dustNum += (inv[i].number - 2) * 5;
-      		inv[i].number = 2;
+      else if(inv.collections[i].card.rarity == "c"){
+    		if(inv.collections[i].number > 2){
+        	dustNum += (inv.collections[i].number - 2) * 5;
+      		inv.collections[i].number = 2;
       	}
      	}
     }
@@ -358,12 +399,14 @@
   	if(dustNum > price){
     	dustNum -= price;
       price = parseInt(price * 1.05, 10);
-      autoNum++;
+	  autoNum++;
       if (autoNum > 1) {
         clearInterval(interval);
       }
+	  justLoaded = false;
+	  pps += .1;
+	  autoNum = pps*10;
       interval = setInterval(createPack, 10000 / autoNum);
-      pps += .1;
       document.getElementById("buyButton").innerHTML = "Buy AutoOpener (" + price + " Dust)";
       document.getElementById("buyText").innerHTML = round(pps, 2) + " PPS";
       document.getElementById("mainDust").innerHTML = "Dust: " + dustNum;
@@ -376,27 +419,67 @@
   
   function save(){
   	var save = {
-    	inv:inv,
-    	dustNum:dustNum,
+	inv:inv,
+      dustNum:dustNum,
       price:price,
-      autoNum:autoNum,
+	  autoNum:autoNum,
       pps:pps
     }
-    
-		localStorage.setItem("save",JSON.stringify(save));
+
+	console.log("saved");
+
+	localStorage.setItem("save",JSON.stringify(save));
   }
   
   setInterval(save, 10000);
   
   function load(){
   	if(localStorage.getItem("save") !== null){
-    	var savegame = JSON.parse(localStorage.getItem("save"));
-      if (typeof savegame.inv !== "undefined") inv = savegame.inv;
+      var savegame = JSON.parse(localStorage.getItem("save"));
+	  console.log(savegame.inv);
+      if (typeof inv !== "undefined"){ 
+		var x = [];
+		var y = [];
+		for(var i = 0; i < savegame.inv.collections.length; i++){
+			var curr = savegame.inv.collections[i];
+			y.push(new Card(curr.card.name, curr.card.rarity, curr.card.cla));
+			addToInv(y[i]);
+		}
+	}
       if (typeof savegame.dustNum !== "undefined") dustNum = savegame.dustNum;
       if (typeof savegame.price !== "undefined") price = savegame.price;
-      if (typeof savegame.autoNum !== "undefined") autoNum = savegame.autoNum;
+	  if (typeof savegame.autoNum !== "undefined") autoNum = savegame.autoNum;
       if (typeof savegame.pps !== "undefined") pps = savegame.pps;
-    }
+	  
+	  console.log(inv);
+	  console.log(autoNum);
+
+	
+	loadMain();
+	if(autoNum > 0){
+		interval = setInterval(createPack, 10000 / autoNum);
+	}
+	}
+  }
+  
+  function clearSave(){
+	console.log("clear");
+	localStorage.removeItem("save")
+	inv = new Inv([]);
+	dustNum = 0;
+	price = 5000;
+	autoNum = 0;
+	pps = 0;
+	clearInterval(interval);
+	interval = null;
+	loadMain();
+	document.getElementById("pack").innerHTML = "";
+  }
+  
+  function loadMain(){
+	document.getElementById("mainDust").innerHTML = "Dust: " + dustNum;
+	document.getElementById("buyButton").innerHTML = "Buy AutoOpener (" + price + " Dust)";
+	document.getElementById("buyText").innerHTML = round(pps, 2) + " PPS";
   }
   
 </script>
