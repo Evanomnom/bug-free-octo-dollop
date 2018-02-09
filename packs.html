@@ -369,6 +369,7 @@
   function createPack(){
   	var c = [];
     var i = 0;
+		do{
     for(i = 0; i<5; i++){
     	var rnd = Math.random();
 			var gnd = Math.random();
@@ -399,12 +400,19 @@
 				}
       }
       c.push(card);
-      addToInv(card);
+      //addToInv(card);
     }
-    inv.collections.sort(function(a, b) {
+		} while (c[c.length-1].rarity == 'c' && c[c.length-2].rarity == 'c' && c[c.length-3].rarity == 'c' && c[c.length-4].rarity == 'c' && c[c.length-5].rarity == 'c');
+    var pArr = [c[c.length-1], c[c.length-2], c[c.length-3], c[c.length-4], c[c.length-5]];
+		for(var i  = 0; i < 5; i++){
+			addToInv(pArr[i]);
+		}
+		
+		inv.collections.sort(function(a, b) {
    		return a.card.name.toLowerCase().localeCompare(b.card.name.toLowerCase());
 		});
-    var p = new Pack(c);
+		
+    var p = new Pack(pArr);
     document.getElementById("pack").innerHTML = p.toString();
   }
   
