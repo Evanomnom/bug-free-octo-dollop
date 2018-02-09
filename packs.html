@@ -263,28 +263,113 @@
 	var rGCards = [];
 	var eGCards = [];
 	var lGCards = [];
+	
+	var totalCards = [];
+	
+	var maxNeutral = 0;
+	var maxDruid = 0;
+	var maxHunter = 0;
+	var maxMage = 0;
+	var maxPaladin = 0;
+	var maxPriest = 0;
+	var maxRogue = 0;
+	var maxShaman = 0;
+	var maxWarlock = 0;
+	var maxWarrior = 0;
+	var maxTotal = 0;
   
   cards.forEach(function(element){
 	if(element.type == "MINION" || element.type == "SPELL" || element.type == "ENCHANTMENT" || element.type == "WEAPON"){
 		if(element.rarity == "COMMON"){
 			cCards.push(new Card(element.name, 'c', element.cardClass, false));
 			cGCards.push(new Card(element.name, 'c', element.cardClass, true));
+			totalCards.push(new Card(element.name, 'c', element.cardClass, false));
+			totalCards.push(new Card(element.name, 'c', element.cardClass, true));
 		}
 		if(element.rarity == "RARE"){
 			rCards.push(new Card(element.name, 'r', element.cardClass, false));
 			rGCards.push(new Card(element.name, 'r', element.cardClass, true));
+			totalCards.push(new Card(element.name, 'r', element.cardClass, false));
+			totalCards.push(new Card(element.name, 'r', element.cardClass, true));
 		}
 		if(element.rarity == "EPIC"){
 			eCards.push(new Card(element.name, 'e', element.cardClass, false));
 			eGCards.push(new Card(element.name, 'e', element.cardClass, true));
+			totalCards.push(new Card(element.name, 'e', element.cardClass, false));
+			totalCards.push(new Card(element.name, 'e', element.cardClass, true));
 		}
 		if(element.rarity == "LEGENDARY"){
 			lCards.push(new Card(element.name, 'l', element.cardClass, false));
 			lGCards.push(new Card(element.name, 'l', element.cardClass, true));
+			totalCards.push(new Card(element.name, 'l', element.cardClass, false));
+			totalCards.push(new Card(element.name, 'l', element.cardClass, true));
 		}
 	}
   });
-  
+	
+	totalCards.forEach(function(element){
+		if(element.rarity == 'c' || element.rarity == 'r' || element.rarity == 'e'){
+			maxTotal += 2;
+			if(element.cla == 'DRUID'){
+				druidTotal += 2;	
+			}
+			if(element.cla == 'HUNTER'){
+				hunterTotal += 2;	
+			}
+			if(element.cla == 'MAGE'){
+				mageTotal += 2;	
+			}
+			if(element.cla == 'PALADIN'){
+				paladinTotal += 2;	
+			}
+			if(element.cla == 'PRIEST'){
+				priestTotal += 2;	
+			}
+			if(element.cla == 'ROGUE'){
+				rogueTotal += 2;	
+			}
+			if(element.cla == 'SHAMAN'){
+				shamanTotal += 2;	
+			}
+			if(element.cla == 'WARLOCK'){
+				warlockTotal += 2;	
+			}
+			if(element.cla == 'WARRIOR'){
+				warriorTotal += 2;	
+			}
+		}
+		if(element.rarity == 'l'){
+			maxTotal += 1;
+			if(element.cla == 'DRUID'){
+				druidTotal += 1;	
+			}
+			if(element.cla == 'HUNTER'){
+				hunterTotal += 1;	
+			}
+			if(element.cla == 'MAGE'){
+				mageTotal += 1;	
+			}
+			if(element.cla == 'PALADIN'){
+				paladinTotal += 1;	
+			}
+			if(element.cla == 'PRIEST'){
+				priestTotal += 1;	
+			}
+			if(element.cla == 'ROGUE'){
+				rogueTotal += 1;	
+			}
+			if(element.cla == 'SHAMAN'){
+				shamanTotal += 1;	
+			}
+			if(element.cla == 'WARLOCK'){
+				warlockTotal += 1;	
+			}
+			if(element.cla == 'WARRIOR'){
+				warriorTotal += 1;	
+			}
+		}
+	}); 
+	
   /*
   var cNEUTRALNames = ["Amani Berserker", "Loot Hoarder", "Bonemare", "Abusive Sergeant", "Acolyte of Pain", "Bloodsail Raider", "Cobalt Scalebane", "Deathspeaker", "Earthen Ring Farseer", "Faerie Dragon", "Glacial Shard", "Hyldnir Frostrider", "Ironbeak Owl", "Jungle Panther", "Kooky Chemist", "Mad Bomber", "Raging Worgen"];
   var rNEUTRALNames = ["Azure Drake", "Ancient MAGE", "Angry Chicken"];
@@ -418,7 +503,12 @@
   
   function showInv(cla){
   	currentClass = cla;
-  
+  	
+		var cNum = 0;
+		var rNum = 0;
+		var eNum = 0;
+		var lNum = 0;
+		
     document.getElementById("legendaries").innerHTML = "";
     document.getElementById("epics").innerHTML = "";
     document.getElementById("rares").innerHTML = "";
@@ -428,15 +518,29 @@
     	if(element.card.cla == cla){
     		if(element.card.rarity == "c"){
     			document.getElementById("commons").innerHTML += element.toString() + "<br>" + "<br>" + "<br>";
+					if(element.number >= 2) cNum +=2;
+					if(element.number == 1) cNum ++;
+					if(element.goldnumber >= 2) cNum +=2;
+					if(element.goldnumber == 1) cNum ++;
      	 }
       	else if(element.card.rarity == "r"){
     			document.getElementById("rares").innerHTML += element.toString() + "<br>" + "<br>" + "<br>";
+					if(element.number >= 2) totalNum +=2;
+					if(element.number == 1) totalNum++;
+					if(element.goldnumber >= 2) totalNum +=2;
+					if(element.goldnumber == 1) totalNum++;
       	}
       else if(element.card.rarity == "e"){
     			document.getElementById("epics").innerHTML += element.toString() + "<br>" + "<br>" + "<br>";
+					if(element.number >= 2) totalNum +=2;
+					if(element.number == 1) totalNum++;
+					if(element.goldnumber >= 2) totalNum +=2;
+					if(element.goldnumber == 1) totalNum++;
       	}
       	else if(element.card.rarity == "l"){
     			document.getElementById("legendaries").innerHTML += element.toString() + "<br>" + "<br>" + "<br>";
+					if(element.number >= 1) totalNum++;
+					if(element.goldnumber >= 1) totalNum++;
       	}
       }
     });
