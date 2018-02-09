@@ -298,7 +298,7 @@
 	var maxTotal = 0;
   
   cards.forEach(function(element){
-	if(element.type == "MINION" || element.type == "SPELL" || element.type == "ENCHANTMENT" || element.type == "WEAPON" || (element.type == "HERO" && element.set != "HERO_SKINS")){
+	if(element.type == "MINION" || element.type == "SPELL" || element.type == "ENCHANTMENT" || element.type == "WEAPON"){
 		if(element.rarity == "COMMON"){
 			cCards.push(new Card(element.name, 'c', element.cardClass, false));
 			cGCards.push(new Card(element.name, 'c', element.cardClass, true));
@@ -397,88 +397,7 @@
 
 		var totals = {'DRUID': druidTotal, 'HUNTER': hunterTotal, 'MAGE': mageTotal, 'PALADIN': paladinTotal, 
 		'PRIEST': priestTotal, 'ROGUE': rogueTotal, 'SHAMAN': shamanTotal, 'WARLOCK':warlockTotal, 'WARRIOR':warriorTotal, 'NEUTRAL':neutralTotal};
-	
-  /*
-  var cNEUTRALNames = ["Amani Berserker", "Loot Hoarder", "Bonemare", "Abusive Sergeant", "Acolyte of Pain", "Bloodsail Raider", "Cobalt Scalebane", "Deathspeaker", "Earthen Ring Farseer", "Faerie Dragon", "Glacial Shard", "Hyldnir Frostrider", "Ironbeak Owl", "Jungle Panther", "Kooky Chemist", "Mad Bomber", "Raging Worgen"];
-  var rNEUTRALNames = ["Azure Drake", "Ancient MAGE", "Angry Chicken"];
-  var eNEUTRALNames = ["Corridor Creeper", "Molten Giant", "Big Game HUNTER"];
-  var lNEUTRALNames = ["Prince Keleseth", "Leeroy Jenkins", "C'thun"];
-  var cDRUIDNames = ["DRUID Common"];
-  var rDRUIDNames = ["DRUID Rare"];
-  var eDRUIDNames = ["DRUID Epic"];
-  var lDRUIDNames = ["DRUID Legendary"];
-  
-  var cHUNTERNames = ["HUNTER Common"];
-  var rHUNTERNames = ["HUNTER Rare"];
-  var eHUNTERNames = ["HUNTER Epic"];
-  var lHUNTERNames = ["HUNTER Legendary"];
-  
-  var cMAGENames = ["Mana Wyrm", "Firelands Portal", "Mirror Entity"];
-  var rMAGENames = ["Counterspell", "Blizzard"];
-  var eMAGENames = ["Ice Block", "Meteor"];
-  var lMAGENames = ["ArchMAGE Antonidas"];
-  
-  var cPALADINNames = ["PALADIN Common"];
-  var rPALADINNames = ["PALADIN Rare"];
-  var ePALADINNames = ["PALADIN Epic"];
-  var lPALADINNames = ["PALADIN Legendary"];
-  
-  var cPRIESTNames = ["PRIEST Common"];
-  var rPRIESTNames = ["PRIEST Rare"];
-  var ePRIESTNames = ["PRIEST Epic"];
-  var lPRIESTNames = ["PRIEST Legendary"];
-  
-  var cROGUENames = ["ROGUE Common"];
-  var rROGUENames = ["ROGUE Rare"];
-  var eROGUENames = ["ROGUE Epic"];
-  var lROGUENames = ["ROGUE Legendary"];
-  
-  var cSHAMANNames = ["SHAMAN Common"];
-  var rSHAMANNames = ["SHAMAN Rare"];
-  var eSHAMANNames = ["SHAMAN Epic"];
-  var lSHAMANNames = ["SHAMAN Legendary"];
-  
-  var cWARLOCKNames = ["WARLOCK Common"];
-  var rWARLOCKNames = ["WARLOCK Rare"];
-  var eWARLOCKNames = ["WARLOCK Epic"];
-  var lWARLOCKNames = ["WARLOCK Legendary"];
-  
-  var cWARRIORNames = ["WARRIOR Common"];
-  var rWARRIORNames = ["WARRIOR Rare"];
-  var eWARRIORNames = ["WARRIOR Epic"];
-  var lWARRIORNames = ["WARRIOR Legendary"];
-  var cCards = [];
-  var rCards = [];
-  var eCards = [];
-  var lCards = [];
-  
-  function addCardsToArray(clas, cArr, rArr, eArr, lArr){
-  	cArr.forEach(function(element){
- 		cCards.push(new Card(element, "c", clas));
-  	});
-  	rArr.forEach(function(element){
- 		rCards.push(new Card(element, "r", clas));
-  	});
-  	eArr.forEach(function(element){
- 		eCards.push(new Card(element, "e", clas));
-  	});
-  	lArr.forEach(function(element){
- 		lCards.push(new Card(element, "l", clas));
-  	});
-  }
-  
-  addCardsToArray("NEUTRAL", cNEUTRALNames, rNEUTRALNames, eNEUTRALNames, lNEUTRALNames);
-  addCardsToArray("MAGE", cMAGENames, rMAGENames, eMAGENames, lMAGENames);
-  addCardsToArray("DRUID", cDRUIDNames, rDRUIDNames, eDRUIDNames, lDRUIDNames);
-  addCardsToArray("HUNTER", cHUNTERNames, rHUNTERNames, eHUNTERNames, lHUNTERNames);
-  addCardsToArray("PALADIN", cPALADINNames, rPALADINNames, ePALADINNames, lPALADINNames);
-  addCardsToArray("PRIEST", cPRIESTNames, rPRIESTNames, ePRIESTNames, lPRIESTNames);
-  addCardsToArray("ROGUE", cROGUENames, rROGUENames, eROGUENames, lROGUENames);
-  addCardsToArray("SHAMAN", cSHAMANNames, rSHAMANNames, eSHAMANNames, lSHAMANNames);
-  addCardsToArray("WARLOCK", cWARLOCKNames, rWARLOCKNames, eWARLOCKNames, lWARLOCKNames);
-  addCardsToArray("WARRIOR", cWARRIORNames, rWARRIORNames, eWARRIORNames, lWARRIORNames);
-  */
-  
+
   function createPack(){
   	var c = [];
     var i = 0;
@@ -699,13 +618,13 @@
   	if(localStorage.getItem("save") !== null){
       var savegame = JSON.parse(localStorage.getItem("save"));
 	  console.log(savegame.inv);
-      if (typeof inv !== "undefined"){ 
-		var x = [];
+      if (typeof inv !== "undefined"){
+				inv = new Inv([]);
 		var y = [];
 		for(var i = 0; i < savegame.inv.collections.length; i++){
 			var curr = savegame.inv.collections[i];
-			y.push(new Card(curr.card.name, curr.card.rarity, curr.card.cla));
-			addToInv(y[i]);
+			y.push(new Card(curr.card.name, curr.card.rarity, curr.card.cla, curr.card.gold));
+			inv.collections.push(new Collection(y[i], curr.number, curr.goldnumber));
 		}
 	}
       if (typeof savegame.dustNum !== "undefined") dustNum = savegame.dustNum;
