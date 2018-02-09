@@ -2,7 +2,7 @@
 
 <style>
   .inventory {
-      height: 550px;
+      height: 700px;
       width: 95%;
       margin: auto;
       text-align: center;
@@ -11,7 +11,7 @@
     
     .panel {
       width: 23%;
-      height: 80%;
+      height: 75%;
       margin: 1%;
       background-color: rgb(210, 210, 210);
       float: left;
@@ -24,20 +24,36 @@
       margin-left: 8px;
     }
 	
-	.title{
+	.subtitle{
+		font-size:15px;
 		font-family:Helvetica;
+		font-style:italic;
+	}
+	
+	.title{
+		font-size:30px;
+		font-weight:bold;
 	}
 </style>
 
 <body>
 
 <div id = "main" style = "margin:auto;text-align:center;">
-	<h1 class = "title">Pack Opener</h1>
+	<span class = "title">Pack Opener</span>
+	<br>
+	<span class = "subtitle">The Quest for a Full Golden Collection</span>
+	<br>
+	<br>
   <p id="pack"></p>
+	<br>
   <button id="openButton" onClick="createPack()">Open Pack</button>
-  <button id="invButton" onClick="showInv('NEUTRAL')">Collection</button>
-  
-  <span id="mainDust">Dust: 0</span>
+	<br>
+	<span id="packsNum">Packs Opened: 0</span>
+  <br>
+	<br>
+	<button id="invButton" onClick="showInv('NEUTRAL')">Collection</button>
+	<br>
+  <span id="mainDust">Dust: 0 </span>
   <br>
   <br>
   <button id="buyButton" onClick="buyAuto()">Buy AutoOpener (5000 Dust)</button>
@@ -52,6 +68,8 @@
 </div>
 
 <div class="inventory" id="inv" style="display:none;">
+			<span id = "invTitle" class = "title"></span>
+			<br>
       <div class="panel">
         <h3 id="legendariesTitle">Legendaries</h3>
         <p id="legendaries"></p>
@@ -244,6 +262,7 @@
   var price = 5000;
   var autoNum = 0;
   var pps = 0;
+	var packsNum = 0;
   var interval = null;
   
   load();
@@ -266,16 +285,16 @@
 	
 	var totalCards = [];
 	
-	var maxNeutral = 0;
-	var maxDruid = 0;
-	var maxHunter = 0;
-	var maxMage = 0;
-	var maxPaladin = 0;
-	var maxPriest = 0;
-	var maxRogue = 0;
-	var maxShaman = 0;
-	var maxWarlock = 0;
-	var maxWarrior = 0;
+	var neutralTotal = 0;
+	var druidTotal = 0;
+	var hunterTotal = 0;
+	var mageTotal = 0;
+	var paladinTotal = 0;
+	var priestTotal = 0;
+	var rogueTotal = 0;
+	var shamanTotal = 0;
+	var warlockTotal = 0;
+	var warriorTotal = 0;
 	var maxTotal = 0;
   
   cards.forEach(function(element){
@@ -337,6 +356,9 @@
 			if(element.cla == 'WARRIOR'){
 				warriorTotal += 2;	
 			}
+			if(element.cla == 'NEUTRAL'){
+				neutralTotal += 2;	
+			}
 		}
 		if(element.rarity == 'l'){
 			maxTotal += 1;
@@ -367,8 +389,14 @@
 			if(element.cla == 'WARRIOR'){
 				warriorTotal += 1;	
 			}
+			if(element.cla == 'NEUTRAL'){
+				neutralTotal += 1;	
+			}
 		}
-	}); 
+	});
+
+		var totals = {'DRUID': druidTotal, 'HUNTER': hunterTotal, 'MAGE': mageTotal, 'PALADIN': paladinTotal, 
+		'PRIEST': priestTotal, 'ROGUE': rogueTotal, 'SHAMAN': shamanTotal, 'WARLOCK':warlockTotal, 'WARRIOR':warriorTotal, 'NEUTRAL':neutralTotal};
 	
   /*
   var cNEUTRALNames = ["Amani Berserker", "Loot Hoarder", "Bonemare", "Abusive Sergeant", "Acolyte of Pain", "Bloodsail Raider", "Cobalt Scalebane", "Deathspeaker", "Earthen Ring Farseer", "Faerie Dragon", "Glacial Shard", "Hyldnir Frostrider", "Ironbeak Owl", "Jungle Panther", "Kooky Chemist", "Mad Bomber", "Raging Worgen"];
@@ -499,15 +527,15 @@
 		
     var p = new Pack(pArr);
     document.getElementById("pack").innerHTML = p.toString();
+		
+		packsNum++;
+		document.getElementById("packsNum").innerHTML = "Packs Opened: " + packsNum;
   }
   
   function showInv(cla){
   	currentClass = cla;
   	
-		var cNum = 0;
-		var rNum = 0;
-		var eNum = 0;
-		var lNum = 0;
+		var totalNum = 0;
 		
     document.getElementById("legendaries").innerHTML = "";
     document.getElementById("epics").innerHTML = "";
@@ -518,10 +546,10 @@
     	if(element.card.cla == cla){
     		if(element.card.rarity == "c"){
     			document.getElementById("commons").innerHTML += element.toString() + "<br>" + "<br>" + "<br>";
-					if(element.number >= 2) cNum +=2;
-					if(element.number == 1) cNum ++;
-					if(element.goldnumber >= 2) cNum +=2;
-					if(element.goldnumber == 1) cNum ++;
+					if(element.number >= 2) totalNum +=2;
+					if(element.number == 1) totalNum++;
+					if(element.goldnumber >= 2) totalNum +=2;
+					if(element.goldnumber == 1) totalNum++;
      	 }
       	else if(element.card.rarity == "r"){
     			document.getElementById("rares").innerHTML += element.toString() + "<br>" + "<br>" + "<br>";
@@ -544,7 +572,9 @@
       	}
       }
     });
-  
+		
+		document.getElementById("invTitle").innerHTML = toTitleCase(cla) + " (" + totalNum + "/" + totals[cla] + ")";
+		
   	document.getElementById("invDust").innerHTML = "Dust: " + dustNum;
   
   	document.getElementById("inv").style.display = 'block';
@@ -654,7 +684,8 @@
       dustNum:dustNum,
       price:price,
 	  autoNum:autoNum,
-      pps:pps
+      pps:pps,
+			packsNum:packsNum
     }
 
 	console.log("saved");
@@ -681,6 +712,7 @@
       if (typeof savegame.price !== "undefined") price = savegame.price;
 	  if (typeof savegame.autoNum !== "undefined") autoNum = savegame.autoNum;
       if (typeof savegame.pps !== "undefined") pps = savegame.pps;
+			if (typeof savegame.packsNum !== "undefined") packsNum = savegame.packsNum;
 	  
 	  console.log(inv);
 	  console.log(autoNum);
@@ -701,6 +733,7 @@
 	price = 5000;
 	autoNum = 0;
 	pps = 0;
+	packsNum = 0;
 	clearInterval(interval);
 	interval = null;
 	loadMain();
@@ -711,7 +744,13 @@
 	document.getElementById("mainDust").innerHTML = "Dust: " + dustNum;
 	document.getElementById("buyButton").innerHTML = "Buy AutoOpener (" + price + " Dust)";
 	document.getElementById("buyText").innerHTML = round(pps, 2) + " PPS";
+	document.getElementById("packsNum").innerHTML = "Packs Opened: " + packsNum;
   }
+	
+	function toTitleCase(str)
+	{
+    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+	}
   
 </script>
 
