@@ -298,7 +298,7 @@
 	var maxTotal = 0;
   
   cards.forEach(function(element){
-	if(element.type == "MINION" || element.type == "SPELL" || element.type == "ENCHANTMENT" || element.type == "WEAPON"){
+	if(element.type == "MINION" || element.type == "SPELL" || element.type == "ENCHANTMENT" || element.type == "WEAPON" || (element.type == "HERO" && element.set != "HERO_SKINS")){
 		if(element.rarity == "COMMON"){
 			cCards.push(new Card(element.name, 'c', element.cardClass, false));
 			cGCards.push(new Card(element.name, 'c', element.cardClass, true));
