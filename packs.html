@@ -639,6 +639,7 @@
 	
 	loadMain();
 	if(autoNum > 0){
+		clearInterval(interval);
 		interval = setInterval(createPack, 10000 / autoNum);
 	}
 	}
