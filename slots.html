@@ -1,0 +1,157 @@
+<html>
+<body>
+<button id = "loanButton" onClick = "loan()" style="display:none;float:right;">Take Out a Loan</button>
+<span id = "deduct" style="float:right;"></span>
+<br>
+<div id = "buttons"></div>
+<p id = "results"></p>
+<p id = "money">$250</p>
+<button id = "slotButton" onClick = "slot()">Slot</button>
+<br>
+<br>
+<button id = "autoButton" onClick = "auto()" style="display:none;">Unlock AutoGambler</button>
+<span id = "autoText" style = "display:none;">0 GPS</span>
+
+<script>
+var money = 50;
+var allAdd = 40;
+var twoAdd = 4;
+var loanMoney = 50;
+var interest = 1.1;
+var periods = 50;
+var toDeduct = 0;
+var intTime = 1000000;
+
+var interval;
+var numClicks = 0;
+var periodCounter = 0;
+var first = true;
+var autoFirst = true;
+var loanFirst = true;
+
+class SlotResult{
+	constructor(x, y, z){
+  	this.x = x;
+    this.y = y;
+    this.z = z;
+  }
+  
+  areSame(){
+    	return (this.x == this.y) && (this.y == this.z) && (this.x == this.z);
+  }
+  
+  twoSame(){
+  	return (((this.x == this.y) && !(this.y == this.z))||((this.y == this.z) && !(this.x == this.y))||((this.x == this.z) && !(this.x == this.y)));
+  }
+  
+  toString(){
+  	var str = this.x + " " + this.y + " " + this.z;
+    if(this.areSame()) str += " " + " +$" + allAdd;
+    if(this.twoSame()) str += " " + " +$" + twoAdd;
+    return str;
+  }
+
+}
+
+class Item{
+	constructor(name, price){
+  	this.name = name;
+    this.price = price;
+    this.sold = false;
+  }
+}
+
+var results = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+var items = [new Item("Watch", 200), new Item("Phone", 500), new Item("TV", 1000), new Item("Car", 7000), new Item("House", 50000), new Item("Children", 100000), new Item("Soul", 666666666)];
+
+for(var i = 0; i < items.length; i++){
+	var disp = "<button id = '" + items[i].name + "' onClick = 'sellItem(" + i + ")' style='display:none;float:right;'>Sell " + items[i].name + "</button>";
+  console.log(disp);
+	document.getElementById("buttons").innerHTML += disp;
+}
+
+function slot(){
+	if(money >= 2){
+  	numClicks++;
+		money-=2;
+		var res = new SlotResult(results[Math.floor(Math.random()*results.length)], results[Math.floor(Math.random()*results.length)], results[Math.floor(Math.random()*results.length)]);
+  	if(res.areSame()) money += allAdd;
+  	if(res.twoSame()) money += twoAdd;
+  
+		document.getElementById("results").innerHTML = res.toString();
+  	document.getElementById("money").innerHTML = "$" + money;
+    
+    if(money < 2 && loanFirst){
+    	document.getElementById("loanButton").style.display = 'block';
+      loanFirst = false;
+    } else if(money < 2 && !items[0].sold){
+    	document.getElementById(items[0].name).style.display = 'block';
+    } else if(money < 2 && !items[1].sold){
+    	document.getElementById(items[1].name).style.display = 'block';
+    } else if(money < 2 && !items[2].sold){
+    	document.getElementById(items[2].name).style.display = 'block';
+    } else if(money < 2 && !items[3].sold){
+    	document.getElementById(items[3].name).style.display = 'block';
+    } else if(money < 2 && !items[4].sold){
+    	document.getElementById(items[4].name).style.display = 'block';
+    } else if(money < 2 && !items[5].sold){
+    	document.getElementById(items[5].name).style.display = 'block';
+    } else if(money < 2 && !items[6].sold){
+    	document.getElementById(items[6].name).style.display = 'block';
+    }
+    
+    if(numClicks > 50 && autoFirst){
+    	document.getElementById("autoButton").style.display = 'block';
+    	document.getElementById("autoText").style.display = 'block';
+      autoFirst = false;
+  	}
+	}
+}
+
+function loan(){
+	if((periodCounter >= periods)||(first)){
+  	if(!first){
+  		clearInterval(interval);
+    }
+    periodCounter = 0;
+    first = false;
+    money += loanMoney;
+  	toDeduct = (loanMoney * interest) / periods;
+  	interval = setInterval(deduct, intTime/periods);
+  	document.getElementById("money").innerHTML = "$" + money;
+    document.getElementById("loanButton").style.display = 'none';
+  }
+}
+
+function deduct(){
+	if(periodCounter < periods){
+		money -= toDeduct;
+    periodCounter++;
+    document.getElementById("deduct").style.display = 'block';
+    document.getElementById("deduct").innerHTML = "-$" + toDeduct;
+    document.getElementById("money").innerHTML = "$" + money;
+    setTimeout(hideResults, 1000);
+    console.log(toDeduct);
+  }
+}
+
+function hideResults(){
+	document.getElementById("deduct").style.display = 'none';
+}
+
+function auto(){
+	setInterval(slot, 1000);
+  document.getElementById("autoButton").style.display = 'none';
+  document.getElementById("autoText").innerHTML = '1 GPS';
+}
+
+function sellItem(x){
+  money += items[x].price;
+  items[x].sold = true;
+  document.getElementById("money").innerHTML = "$" + money;
+  document.getElementById(items[x].name).style.display = 'none';
+}
+
+</script>
+</body>
+</html>
